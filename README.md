@@ -102,6 +102,3 @@ This project was made possible by the fantastic APIs and tools provided by the f
     * [Font Awesome](https://fontawesome.com/) for icons.
     * [Google Fonts](https://fonts.google.com/) for typography.
 
-### License
-
-This project is licensed under the **MIT License**. See the `LICENSE` file for more details. You are free to use, modify, and distribute this project as you see fit.
