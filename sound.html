@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soundtrack Your Story</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#667eea',
+                        'brand-secondary': '#764ba2',
+                        'brand-charcoal': '#2D3748',
+                        'brand-offwhite': '#F9F9F9',
+                    },
+                    fontFamily: {
+                        'heading': ['Lora', 'serif'],
+                        'body': ['Nunito Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Component-specific styles */
+        .spotify-embed {
+            border-radius: 12px;
+        }
+        
+        .book-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(45, 55, 72, 0.1);
+        }
+        
+        /* Background gradients */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Header styling */
+        .header-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Social link interactions */
+        .social-link {
+            transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+
+<body class="font-body bg-brand-offwhite text-brand-charcoal">
+    <!-- Header Navigation -->
+    <header class="gradient-bg header-shadow sticky top-0 z-50 text-white">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-heading font-bold flex items-center">
+                <i class="fas fa-music mr-2"></i>
+                Soundtrack Your Story
+            </a>
+            <div class="flex items-center space-x-4">
+                <a href="https://github.com/sushant23-git" target="_blank" rel="noopener noreferrer" class="social-link hidden sm:inline-block">
+                    <i class="fab fa-github text-lg"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/sushant-gajbhiye-8a93b3246/" target="_blank" rel="noopener noreferrer" class="social-link hidden sm:inline-block">
+                    <i class="fab fa-linkedin text-lg"></i>
+                </a>
+                <a href="mailto:sushantgajbhiye.99@gmail.com" class="social-link">
+                    <i class="fas fa-envelope text-lg"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section with Search -->
+        <section id="search-section" class="bg-white py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-heading font-bold text-brand-charcoal mb-4">
+                    Find the Perfect Soundtrack
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Enter a book title or author below to discover AI-generated playlists and community-curated soundtracks.
+                </p>
+                
+                <!-- Search Interface -->
+                <div class="mt-8 flex justify-center">
+                    <div class="relative w-full max-w-lg">
+                        <input 
+                            type="text" 
+                            id="book-search-input" 
+                            placeholder="e.g., 'The Hobbit' or 'J.R.R. Tolkien'" 
+                            class="w-full pl-5 pr-16 py-4 text-lg border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                        >
+                        <button 
+                            id="search-btn" 
+                            class="absolute right-0 top-0 h-full px-6 text-white bg-brand-primary rounded-r-full hover:bg-brand-secondary focus:outline-none"
+                        >
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status Indicators -->
+        <div id="loading" class="text-center my-12 hidden">
+            <i class="fas fa-spinner fa-spin text-4xl text-brand-primary"></i>
+            <p class="text-lg text-gray-600 mt-4">Crafting your perfect soundtrack...</p>
+        </div>
+        
+        <div id="error-message" class="text-center my-12 hidden">
+            <p class="text-lg text-red-600 bg-red-100 p-4 rounded-lg inline-block"></p>
+        </div>
+
+        <!-- Results Display -->
+        <section id="results-section" class="py-16 hidden">
+            <div class="container mx-auto px-6">
+                <!-- Book Information Header -->
+                <div id="book-details-header" class="mb-12"></div>
+                
+                <!-- AI-Generated Playlist -->
+                <div id="custom-playlist-section" class="mb-12 hidden">
+                    <h2 class="text-3xl font-heading font-bold mb-6">Your Generated Playlist</h2>
+                    <div id="playlist" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Generated tracks will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Community Playlists -->
+                <div id="premade-playlists-section" class="hidden">
+                    <h2 class="text-3xl font-heading font-bold mb-6">Community Playlists</h2>
+                    <div id="premade-playlists" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Community playlists will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white mt-auto">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- About Section -->
+                <div class="text-center md:text-left">
+                    <h3 class="font-heading text-xl font-bold mb-4">About Us</h3>
+                    <p class="text-blue-100 text-sm leading-relaxed">
+                        Soundtrack Your Story was created by a team of book lovers and music enthusiasts who believe that the right soundtrack can transform your reading experience. We use AI to match books with the perfect music.
+                    </p>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="text-center">
+                    <h3 class="font-heading text-xl font-bold mb-4">Connect With Me</h3>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="https://github.com/sushant23-git" target="_blank" rel="noopener noreferrer" class="social-link bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/sushant-gajbhiye-8a93b3246/" target="_blank" rel="noopener noreferrer" class="social-link bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://www.hackerrank.com/profile/sushantgajbhiye1" target="_blank" rel="noopener noreferrer" class="social-link bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm">
+                            <i class="fab fa-hackerrank"></i>
+                        </a>
+                        <a href="mailto:sushantgajbhiye.99@gmail.com" class="social-link bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="https://www.instagram.com/sushaannnnttttttt" target="_blank" rel="noopener noreferrer" class="social-link bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full backdrop-blur-sm">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="text-center md:text-right">
+                    <h3 class="font-heading text-xl font-bold mb-4">Get In Touch</h3>
+                    <div class="space-y-2 text-blue-100 text-sm">
+                        <p class="flex items-center justify-center md:justify-end gap-2">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:sushantgajbhiye.99@gmail.com" class="hover:text-white transition-colors">
+                                sushantgajbhiye.99@gmail.com
+                            </a>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-end gap-2">
+                            <i class="fab fa-spotify"></i>
+                            <span class="hover:text-white transition-colors">Music data by Spotify</span>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-end gap-2">
+                            <i class="fas fa-book"></i>
+                            <span class="hover:text-white transition-colors">Book data by Google Books</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="border-t border-white border-opacity-20 mt-8 pt-6 text-center">
+                <p class="text-blue-100 text-sm">
+                    &copy; 2025 Soundtrack Your Story. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================================================
+        // APPLICATION CONFIGURATION
+        // ============================================================================
+        
+        const CONFIG = {
+            GOOGLE_BOOKS_API_KEY: 'AIzaSyAfrzDukf8QeDIm8sGxD7HHK9NF5hAMTAg',
+            SPOTIFY_CLIENT_ID: '3dbc3c6664a4432db3040ee7c04e836b',
+            SPOTIFY_CLIENT_SECRET: '8341d09197d8499da3b9c25b0c118008',
+            SPOTIFY_TOKEN_URL: 'https://accounts.spotify.com/api/token',
+            GOOGLE_BOOKS_BASE_URL: 'https://www.googleapis.com/books/v1/volumes',
+            SPOTIFY_API_BASE_URL: 'https://api.spotify.com/v1'
+        };
+
+        // ============================================================================
+        // DOM ELEMENT REFERENCES
+        // ============================================================================
+        
+        const DOM = {
+            searchButton: document.getElementById('search-btn'),
+            searchInput: document.getElementById('book-search-input'),
+            resultsSection: document.getElementById('results-section'),
+            bookDetailsHeader: document.getElementById('book-details-header'),
+            customPlaylistSection: document.getElementById('custom-playlist-section'),
+            playlistContainer: document.getElementById('playlist'),
+            premadePlaylistsSection: document.getElementById('premade-playlists-section'),
+            premadePlaylistsContainer: document.getElementById('premade-playlists'),
+            loadingIndicator: document.getElementById('loading'),
+            errorMessage: document.getElementById('error-message')
+        };
+
+        // ============================================================================
+        // APPLICATION STATE
+        // ============================================================================
+        
+        const AppState = {
+            currentBook: {
+                title: '',
+                author: '',
+                genres: []
+            },
+            spotifyAccessToken: null
+        };
+
+        // ============================================================================
+        // UTILITY FUNCTIONS
+        // ============================================================================
+        
+        /**
+         * Displays an error message to the user
+         * @param {string} message - The error message to display
+         */
+        function showErrorMessage(message) {
+            const errorParagraph = DOM.errorMessage.querySelector('p');
+            errorParagraph.textContent = message;
+            DOM.errorMessage.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the error message
+         */
+        function hideErrorMessage() {
+            DOM.errorMessage.classList.add('hidden');
+        }
+
+        /**
+         * Shows the loading indicator
+         */
+        function showLoading() {
+            DOM.loadingIndicator.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the loading indicator
+         */
+        function hideLoading() {
+            DOM.loadingIndicator.classList.add('hidden');
+        }
+
+        /**
+         * Maps book genres to Spotify music genres
+         * @param {string[]} bookGenres - Array of book genres
+         * @returns {string[]} Array of Spotify genres
+         */
+        function mapBookGenresToSpotifyGenres(bookGenres) {
+            if (!bookGenres || bookGenres.length === 0) {
+                return ['pop', 'rock', 'indie'];
+            }
+
+            const genreMapping = {
+                'fiction': 'indie',
+                'fantasy': 'classical',
+                'science fiction': 'electronic',
+                'sci-fi': 'electronic',
+                'horror': 'metal',
+                'thriller': 'techno',
+                'mystery': 'ambient',
+                'romance': 'r-n-b',
+                'history': 'folk',
+                'historical': 'folk',
+                'biography': 'jazz',
+                'adventure': 'world-music',
+                'dystopian': 'industrial',
+                'humor': 'funk'
+            };
+
+            const mappedGenres = bookGenres.flatMap(genre => {
+                const lowerGenre = genre.toLowerCase();
+                return Object.keys(genreMapping).filter(key => 
+                    lowerGenre.includes(key)
+                ).map(key => genreMapping[key]);
+            });
+
+            const uniqueGenres = [...new Set(mappedGenres)];
+            
+            if (uniqueGenres.length === 0) {
+                return ['pop', 'chill', 'ambient'];
+            }
+
+            return uniqueGenres.slice(0, 5);
+        }
+
+        // ============================================================================
+        // API FUNCTIONS
+        // ============================================================================
+        
+        /**
+         * Retrieves Spotify access token for API authentication
+         * @returns {Promise<string|null>} Access token or null if failed
+         */
+        async function getSpotifyAccessToken() {
+            if (!CONFIG.SPOTIFY_CLIENT_ID || !CONFIG.SPOTIFY_CLIENT_SECRET) {
+                showErrorMessage('Spotify API credentials are missing.');
+                return null;
+            }
+
+            try {
+                const credentials = btoa(`${CONFIG.SPOTIFY_CLIENT_ID}:${CONFIG.SPOTIFY_CLIENT_SECRET}`);
+                
+                const response = await fetch(CONFIG.SPOTIFY_TOKEN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${credentials}`
+                    },
+                    body: 'grant_type=client_credentials'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get Spotify access token.');
+                }
+
+                const data = await response.json();
+                return data.access_token;
+            } catch (error) {
+                console.error('Error getting Spotify access token:', error);
+                showErrorMessage('Could not connect to Spotify.');
+                return null;
+            }
+        }
+
+        /**
+         * Searches for books using Google Books API
+         * @param {string} query - Search query (book title or author)
+         * @returns {Promise<Object|null>} Book data or null if not found
+         */
+        async function searchBooks(query) {
+            if (!CONFIG.GOOGLE_BOOKS_API_KEY) {
+                showErrorMessage('Google Books API key is missing.');
+                return null;
+            }
+
+            try {
+                const searchUrl = `${CONFIG.GOOGLE_BOOKS_BASE_URL}?q=${encodeURIComponent(query)}&key=${CONFIG.GOOGLE_BOOKS_API_KEY}`;
+                const response = await fetch(searchUrl);
+                
+                if (!response.ok) {
+                    throw new Error('Network response from Google Books was not ok.');
+                }
+                
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    return data.items[0].volumeInfo;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error searching books:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Gets music recommendations from Spotify based on book genres
+         * @returns {Promise<Array>} Array of recommended tracks
+         */
+        async function getMusicRecommendations() {
+            const accessToken = await getSpotifyAccessToken();
+            if (!accessToken) return [];
+
+            const spotifyGenres = mapBookGenresToSpotifyGenres(AppState.currentBook.genres);
+            const params = new URLSearchParams({
+                limit: 6,
+                seed_genres: spotifyGenres.join(',')
+            });
+
+            try {
+                const response = await fetch(`${CONFIG.SPOTIFY_API_BASE_URL}/recommendations?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch recommendations.');
+                }
+                
+                const data = await response.json();
+                return data.tracks || [];
+            } catch (error) {
+                console.error('Error getting recommendations:', error);
+                return [];
+            }
+        }
+
+        /**
+         * Searches for existing playlists related to the book
+         * @returns {Promise<Array>} Array of relevant playlists
+         */
+        async function findRelevantPlaylists() {
+            const accessToken = await getSpotifyAccessToken();
+            if (!accessToken) return [];
+
+            const searchQuery = `"${AppState.currentBook.title}"`;
+            const params = new URLSearchParams({
+                q: searchQuery,
+                type: 'playlist',
+                limit: 20
+            });
+
+            try {
+                const response = await fetch(`${CONFIG.SPOTIFY_API_BASE_URL}/search?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to search for playlists.');
+                }
+
+                const data = await response.json();
+                return data.playlists?.items || [];
+            } catch (error) {
+                console.error('Error finding playlists:', error);
+                return [];
+            }
+        }
+
+        // ============================================================================
+        // UI RENDERING FUNCTIONS
+        // ============================================================================
+        
+        /**
+         * Displays book information in the header
+         * @param {Object} bookData - Book information from Google Books API
+         */
+        function renderBookHeader(bookData) {
+            const coverImage = bookData.imageLinks?.thumbnail || 'https://placehold.co/100x150/e2e8f0/333?text=No+Image';
+            const authors = bookData.authors ? bookData.authors.join(', ') : 'Unknown Author';
+            
+            DOM.bookDetailsHeader.innerHTML = `
+                <div class="flex flex-col md:flex-row items-center text-center md:text-left">
+                    <img 
+                        src="${coverImage}" 
+                        alt="Book Cover" 
+                        class="w-24 h-auto rounded-md mb-4 md:mb-0 md:mr-6 shadow-lg"
+                    >
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-heading font-bold text-brand-charcoal">
+                            Soundtracks for <span class="text-brand-primary">${bookData.title}</span>
+                        </h2>
+                        <p class="text-lg text-gray-600">by ${authors}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Displays the AI-generated playlist
+         * @param {Array} tracks - Array of Spotify track objects
+         */
+        function renderCustomPlaylist(tracks) {
+            if (tracks.length === 0) return;
+
+            DOM.customPlaylistSection.classList.remove('hidden');
+            
+            const trackElements = tracks.map(track => `
+                <div class="book-card bg-white p-4 rounded-lg shadow-md">
+                    <iframe 
+                        class="spotify-embed" 
+                        src="https://open.spotify.com/embed/track/${track.id}" 
+                        width="100%" 
+                        height="80" 
+                        frameBorder="0" 
+                        allowtransparency="true" 
+                        allow="encrypted-media"
+                    ></iframe>
+                </div>
+            `).join('');
+
+            DOM.playlistContainer.innerHTML = trackElements;
+        }
+
+        /**
+         * Displays community playlists
+         * @param {Array} playlists - Array of Spotify playlist objects
+         */
+        function renderCommunityPlaylists(playlists) {
+            const bookTitle = AppState.currentBook.title.toLowerCase();
+            const bookAuthor = AppState.currentBook.author.toLowerCase();
+
+            // Filter playlists that are relevant to the book
+            const relevantPlaylists = playlists.filter(playlist => {
+                if (!playlist || !playlist.name) return false;
+                
+                const playlistName = playlist.name.toLowerCase();
+                const playlistDescription = (playlist.description || '').toLowerCase();
+                
+                return playlistName.includes(bookTitle) || 
+                       playlistDescription.includes(bookTitle) || 
+                       (bookAuthor && playlistDescription.includes(bookAuthor));
+            }).slice(0, 6);
+
+            if (relevantPlaylists.length > 0) {
+                DOM.premadePlaylistsSection.classList.remove('hidden');
+                
+                const playlistElements = relevantPlaylists.map(playlist => `
+                    <div class="book-card bg-white p-4 rounded-lg shadow-md">
+                        <iframe 
+                            class="spotify-embed" 
+                            src="https://open.spotify.com/embed/playlist/${playlist.id}" 
+                            width="100%" 
+                            height="352" 
+                            frameBorder="0" 
+                            allowfullscreen="" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy"
+                        ></iframe>
+                    </div>
+                `).join('');
+
+                DOM.premadePlaylistsContainer.innerHTML = playlistElements;
+            }
+        }
+
+        // ============================================================================
+        // MAIN APPLICATION LOGIC
+        // ============================================================================
+        
+        /**
+         * Main search handler - orchestrates the entire search process
+         */
+        async function handleBookSearch() {
+            const searchQuery = DOM.searchInput.value.trim();
+            
+            if (!searchQuery) {
+                showErrorMessage('Please enter a book title or author.');
+                return;
+            }
+
+            // Reset UI state
+            hideErrorMessage();
+            showLoading();
+            DOM.resultsSection.classList.add('hidden');
+            DOM.playlistContainer.innerHTML = '';
+            DOM.premadePlaylistsContainer.innerHTML = '';
+
+            try {
+                // Step 1: Search for the book
+                const bookData = await searchBooks(searchQuery);
+                
+                if (!bookData) {
+                    showErrorMessage('No books found for your query.');
+                    return;
+                }
+
+                // Step 2: Update application state
+                AppState.currentBook = {
+                    title: bookData.title,
+                    author: bookData.authors ? bookData.authors[0] : '',
+                    genres: bookData.categories || []
+                };
+
+                // Step 3: Display book information
+                renderBookHeader(bookData);
+
+                // Step 4: Fetch music recommendations and playlists in parallel
+                const [recommendedTracks, communityPlaylists] = await Promise.all([
+                    getMusicRecommendations(),
+                    findRelevantPlaylists()
+                ]);
+
+                // Step 5: Render results
+                renderCustomPlaylist(recommendedTracks);
+                renderCommunityPlaylists(communityPlaylists);
+
+                // Step 6: Show results and scroll to them
+                DOM.resultsSection.classList.remove('hidden');
+                DOM.resultsSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+
+            } catch (error) {
+                console.error('Error during search:', error);
+                showErrorMessage('An error occurred during the search. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ============================================================================
+        // EVENT LISTENERS
+        // ============================================================================
+        
+        // Search button click handler
+        DOM.searchButton.addEventListener('click', handleBookSearch);
+
+        // Enter key handler for search input
+        DOM.searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                handleBookSearch();
+            }
+        });
+    </script>
+</body>
+</html>
